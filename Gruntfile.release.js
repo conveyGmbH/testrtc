@@ -34,7 +34,7 @@ module.exports = function(grunt) {
         options: {
           inlineScripts: true,
           inlineCss: true,
-          stripComments: false,
+          stripComments: true,
           csp: 'main.js'
         },
         files: {
@@ -74,7 +74,25 @@ module.exports = function(grunt) {
       ]
     },
 
-    
+    uglify: {
+      options: {
+        compress: {
+          global_defs: {
+            'API_KEY': process.env.API_KEY,
+            'TURN_URL': 'https://networktraversal.googleapis.com/v1alpha/iceconfig?key='
+          },
+          dead_code: true,
+        },
+        // Enable when you want debug the code.
+        beautify: false,
+        mangle: true
+      },
+      target: {
+        files: {
+          'out/src/main.js': ['out/src/main.js']
+        }
+      }
+    },
 
   });
 
@@ -85,10 +103,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-vulcanize');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Set default tasks to run when grunt is called without parameters
   grunt.registerTask('default', ['csslint', 'htmllint', 'eslint']);
 
   // Cleans out/ folder, copies files in place and vulcanizes index.html to out/.
-  grunt.registerTask('build', ['clean', 'copy', 'vulcanize']);
+  grunt.registerTask('build', ['clean', 'copy', 'vulcanize', 'uglify']);
 };
