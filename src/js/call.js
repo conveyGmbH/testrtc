@@ -298,6 +298,7 @@ Call.asyncCreateStunConfig = function(onSuccess, onError) {
 
 // Ask network traversal API to give us TURN server credentials and URLs.
 Call.fetchTurnConfig_ = function(onSuccess, onError) {
+  var settings = currentTest.settings;
   // Check if credentials exist or have expired (and subtract testRuntTIme so
   // that the test can finish if near the end of the lifetime duration).
   // lifetimeDuration is in seconds.
@@ -342,7 +343,13 @@ Call.fetchTurnConfig_ = function(onSuccess, onError) {
       a.href = uri;
       return a.href;
   }
-  var url = abs('stuns.json');
+  var stunsFolder = settings && settings["stunsFolder"];
+  if (!stunsFolder) {
+      stunsFolder = "";
+  } else if (typeof stunsFolder === "string" && stunsFolder[stunsFolder.length - 1] !== "/") {
+      stunsFolder += "/";
+  }
+  var url = abs(stunsFolder + 'stuns.json');
 
   xhr.onreadystatechange = onResult;
   xhr.open('GET', url, true);
