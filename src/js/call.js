@@ -190,13 +190,6 @@ Call.prototype = {
   }
 };
 
-Call.settings = {
-    turnURI: "turn:coturn.convey.de:443?transport=tcp",
-    turnUsername: "1625846649:w_x1680dmutjdr",
-    turnCredential: "6gC9AP3PibkogZhFZyKk8QDW0Wo=",
-    stunURI: "stun:coturn.convey.de"
-}
-
 Call.noFilter = function() {
   return true;
 };
@@ -241,11 +234,6 @@ Call.cachedIceConfigFetchTime_ = null;
 // Get a TURN config, either from settings or from network traversal server.
 Call.asyncCreateTurnConfig = function(onSuccess, onError) {
   var settings = currentTest.settings;
-  if (!settings.turnURI) {
-      settings.turnURI = Call.settings.turnURI;
-      settings.turnUsername = Call.settings.turnUsername;
-      settings.turnCredential = Call.settings.turnCredential;
-  }
   if (typeof(settings.turnURI) === 'string' && settings.turnURI !== '') {
     var iceServer = {
       'username': settings.turnUsername || '',
@@ -257,7 +245,23 @@ Call.asyncCreateTurnConfig = function(onSuccess, onError) {
     setTimeout(onSuccess.bind(null, config), 0);
   } else {
     Call.fetchTurnConfig_(function(response) {
-      var config = {'iceServers': response.iceServers};
+        var iceServer = {
+            'username': '',
+            'credential': '',
+            'urls': []
+        };
+        if (response.turnServers) {
+            response.turnServers.forEach(function(item) {
+                if (!iceServer['username']) {
+                    iceServer['username'] = item.username;
+                }
+                if (!iceServer['credential']) {
+                    iceServer['credential'] = item.password;
+                }
+                iceServer['urls'].push(item.url);
+            });
+        }
+      var config = {'iceServers': [iceServer]};
       report.traceEventInstant('turn-config', config);
       onSuccess(config);
     }, onError);
@@ -267,9 +271,6 @@ Call.asyncCreateTurnConfig = function(onSuccess, onError) {
 // Get a STUN config, either from settings or from network traversal server.
 Call.asyncCreateStunConfig = function(onSuccess, onError) {
   var settings = currentTest.settings;
-  if (!settings.stunURI) {
-      settings.stunURI = Call.settings.stunURI;
-  }
   if (typeof(settings.stunURI) === 'string' && settings.stunURI !== '') {
     var iceServer = {
       'urls': settings.stunURI.split(',')
@@ -279,7 +280,16 @@ Call.asyncCreateStunConfig = function(onSuccess, onError) {
     setTimeout(onSuccess.bind(null, config), 0);
   } else {
     Call.fetchTurnConfig_(function(response) {
-      var config = {'iceServers': response.iceServers.urls};
+        var urls = [];
+        if (response.stunServers) {
+            response.stunServers.forEach(function(item) {
+                urls.push(item.url);
+            });
+        }
+        var iceServer = {
+            'urls': urls
+        };
+      var config = {'iceServers': [iceServer]};
       report.traceEventInstant('stun-config', config);
       onSuccess(config);
     }, onError);
@@ -293,9 +303,12 @@ Call.fetchTurnConfig_ = function(onSuccess, onError) {
   // lifetimeDuration is in seconds.
   var testRunTime = 240; // Time in seconds to allow a test run to complete.
   if (Call.cachedIceServers_) {
+      var ttl = Call.cachedIceServers_ &&
+          Call.cachedIceServers_.turnServers &&
+          Call.cachedIceServers_.turnServers[0] &&
+          Call.cachedIceServers_.turnServers[0].ttl || 0;
     var isCachedIceConfigExpired =
-      ((Date.now() - Call.cachedIceConfigFetchTime_) / 1000 >
-      parseInt(Call.cachedIceServers_.lifetimeDuration) - testRunTime);
+      ((Date.now() - Call.cachedIceConfigFetchTime_) / 1000 > (ttl- testRunTime));
     if (!isCachedIceConfigExpired) {
       report.traceEventInstant('fetch-ice-config', 'Using cached credentials.');
       onSuccess(Call.getCachedIceCredentials_());
@@ -324,13 +337,14 @@ Call.fetchTurnConfig_ = function(onSuccess, onError) {
     report.traceEventInstant('fetch-ice-config', 'Fetching new credentials.');
     onSuccess(Call.getCachedIceCredentials_());
   }
-
-  var API_KEY = (process && process.env && process.env.API_KEY);
-  var TURN_URL = 'https://networktraversal.googleapis.com/v1alpha/iceconfig?key=';
+  function abs(uri) {
+      var a = document.createElement("a");
+      a.href = uri;
+      return a.href;
+  }
+  var url = abs('stuns.json');
 
   xhr.onreadystatechange = onResult;
-  // API_KEY and TURN_URL is replaced with API_KEY environment variable via
-  // Gruntfile.js during build time by uglifyJS.
-  xhr.open('POST', TURN_URL + API_KEY, true);
+  xhr.open('GET', url, true);
   xhr.send();
 };

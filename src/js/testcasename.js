@@ -17,21 +17,21 @@
 // Enumerate test case names.
 function TestCaseNames() {
   this.testCases = {
-    AUDIOCAPTURE: 'Audio capture',
+    AUDIOCAPTURE: 'Check capture, please speak into the microphone',
     CHECKRESOLUTION240: 'Check resolution 320x240',
     CHECKRESOLUTION480: 'Check resolution 640x480',
     CHECKRESOLUTION720: 'Check resolution 1280x720',
-    CHECKSUPPORTEDRESOLUTIONS: 'Check supported resolutions',
-    DATATHROUGHPUT: 'Data throughput',
-    IPV6ENABLED: 'Ipv6 enabled',
-    NETWORKLATENCY: 'Network latency',
-    NETWORKLATENCYRELAY: 'Network latency - Relay',
-    UDPENABLED: 'Udp enabled',
-    TCPENABLED: 'Tcp enabled',
-    VIDEOBANDWIDTH: 'Video bandwidth',
-    RELAYCONNECTIVITY: 'Relay connectivity',
-    REFLEXIVECONNECTIVITY: 'Reflexive connectivity',
-    HOSTCONNECTIVITY: 'Host connectivity'
+    CHECKSUPPORTEDRESOLUTIONS: 'Check supported camera resolutions',
+    DATATHROUGHPUT: 'Check data throughput',
+    IPV6ENABLED: 'Check Ipv6 enabled',
+    NETWORKLATENCY: 'Check network latency',
+    NETWORKLATENCYRELAY: 'Check network latency - Relay',
+    UDPENABLED: 'Check Udp enabled',
+    TCPENABLED: 'Check Tcp enabled',
+    VIDEOBANDWIDTH: 'Check video bandwidth',
+    RELAYCONNECTIVITY: 'Check relay connectivity',
+    REFLEXIVECONNECTIVITY: 'Check reflexive connectivity',
+    HOSTCONNECTIVITY: 'Check host connectivity'
   };
   return this.testCases;
 }
