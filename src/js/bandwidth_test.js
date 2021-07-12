@@ -10,12 +10,12 @@
 // Creates a loopback via relay candidates and tries to send as many packets
 // with 1024 chars as possible while keeping dataChannel bufferedAmmount above
 // zero.
-addTest(testSuiteName.THROUGHPUT, testCaseName.DATATHROUGHPUT, function(test) {
-  var dataChannelThroughputTest = new DataChannelThroughputTest(test);
+addTest(testSuiteName.THROUGHPUT, testCaseName.DATATHROUGHPUTRELAY, function(test) {
+  var dataChannelThroughputTest = new DataChannelThroughputTest(test, Call.isRelay);
   dataChannelThroughputTest.run();
 });
 
-function DataChannelThroughputTest(test) {
+function DataChannelThroughputTest(test, iceCandidateFilter) {
   this.test = test;
   this.testDurationSeconds = 5.0;
   this.startTime = null;
@@ -36,6 +36,7 @@ function DataChannelThroughputTest(test) {
   this.call = null;
   this.senderChannel = null;
   this.receiveChannel = null;
+  this.iceCandidateFilter = iceCandidateFilter || Call.isRelay;
 }
 
 DataChannelThroughputTest.prototype = {
@@ -46,7 +47,7 @@ DataChannelThroughputTest.prototype = {
 
   start: function(config) {
     this.call = new Call(config, this.test);
-    this.call.setIceCandidateFilter(Call.isRelay);
+    this.call.setIceCandidateFilter(this.iceCandidateFilter);
     this.senderChannel = this.call.pc1.createDataChannel(null);
     this.senderChannel.addEventListener('open', this.sendingStep.bind(this));
 
@@ -116,12 +117,12 @@ DataChannelThroughputTest.prototype = {
 // relay candidates for 40 seconds. Computes rtt and bandwidth estimation
 // average and maximum as well as time to ramp up (defined as reaching 75% of
 // the max bitrate. It reports infinite time to ramp up if never reaches it.
-addTest(testSuiteName.THROUGHPUT, testCaseName.VIDEOBANDWIDTH, function(test) {
-  var videoBandwidthTest = new VideoBandwidthTest(test);
+addTest(testSuiteName.THROUGHPUT, testCaseName.VIDEOBANDWIDTHRELAY, function(test) {
+  var videoBandwidthTest = new VideoBandwidthTest(test, Call.isRelay);
   videoBandwidthTest.run();
 });
 
-function VideoBandwidthTest(test) {
+function VideoBandwidthTest(test, iceCandidateFilter) {
   this.test = test;
   this.maxVideoBitrateKbps = 2000;
   this.durationMs = 40000;
@@ -150,6 +151,7 @@ function VideoBandwidthTest(test) {
       minHeight: 720
     }
   };
+  this.iceCandidateFilter = iceCandidateFilter || Call.isRelay;
 }
 
 VideoBandwidthTest.prototype = {
@@ -160,7 +162,7 @@ VideoBandwidthTest.prototype = {
 
   start: function(config) {
     this.call = new Call(config, this.test);
-    this.call.setIceCandidateFilter(Call.isRelay);
+    this.call.setIceCandidateFilter(this.iceCandidateFilter);
     // FEC makes it hard to study bandwidth estimation since there seems to be
     // a spike when it is enabled and disabled. Disable it for now. FEC issue
     // tracked on: https://code.google.com/p/webrtc/issues/detail?id=3050

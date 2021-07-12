@@ -10,7 +10,8 @@
 // Test whether it can connect via UDP to a TURN server
 // Get a TURN config, and try to get a relay candidate using UDP.
 addTest(testSuiteName.NETWORK, testCaseName.UDPENABLED, function(test) {
-  var networkTest = new NetworkTest(test, 'udp', null, Call.isRelay);
+  var params = {optional: [{udpRelay: true}]};
+  var networkTest = new NetworkTest(test, 'udp', params, Call.isRelay);
   networkTest.run();
 });
 
@@ -88,7 +89,9 @@ NetworkTest.prototype = {
     } catch (error) {
       if (params !== null && params.optional[0].googIPv6) {
         this.test.reportWarning('Failed to create peer connection, IPv6 ' +
-            'might not be setup/supported on the network.');
+          'might not be setup/supported on the network.');
+      } else if (params !== null && params.optional[0].udpRelay) {
+        this.test.reportWarning('Failed to create peer connection, udp relay: ' + error );
       } else {
         this.test.reportError('Failed to create peer connection: ' + error);
       }
@@ -119,6 +122,9 @@ NetworkTest.prototype = {
         if (params !== null && params.optional[0].googIPv6) {
           this.test.reportWarning('Failed to gather IPv6 candidates, it ' +
               'might not be setup/supported on the network.');
+        } else if (params !== null && params.optional[0].udpRelay) {
+          this.test.reportWarning('Failed to gather udp relay candidates, it ' +
+            'might not be setup/supported on the network.');
         } else {
           this.test.reportError('Failed to gather specified candidates');
         }

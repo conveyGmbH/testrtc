@@ -17,18 +17,20 @@
 // Enumerate test case names.
 function TestCaseNames() {
   this.testCases = {
-    AUDIOCAPTURE: 'Check capture, please speak into the microphone',
-    CHECKRESOLUTION240: 'Check resolution 320x240',
-    CHECKRESOLUTION480: 'Check resolution 640x480',
-    CHECKRESOLUTION720: 'Check resolution 1280x720',
+    AUDIOCAPTURE: 'Check audio capture, please speak into the microphone',
+    CHECKRESOLUTION240: 'Check video capture, resolution 320x240',
+    CHECKRESOLUTION480: 'Check video capture, resolution 640x480',
+    CHECKRESOLUTION720: 'Check video capture, resolution 1280x720',
     CHECKSUPPORTEDRESOLUTIONS: 'Check supported camera resolutions',
-    DATATHROUGHPUT: 'Check data throughput',
-    IPV6ENABLED: 'Check Ipv6 enabled',
+    DATATHROUGHPUTRELAY: 'Check data throughput - Relay',
+    DATATHROUGHPUT: 'Check data throughput - Host',
     NETWORKLATENCY: 'Check network latency',
     NETWORKLATENCYRELAY: 'Check network latency - Relay',
     UDPENABLED: 'Check Udp enabled',
-    TCPENABLED: 'Check Tcp enabled',
-    VIDEOBANDWIDTH: 'Check video bandwidth',
+    TCPENABLED: 'Check Tcp Relay enabled',
+    IPV6ENABLED: 'Check Ipv6 enabled',
+    VIDEOBANDWIDTHRELAY: 'Check video bandwidth - Relay',
+    VIDEOBANDWIDTH: 'Check video bandwidth - Host',
     RELAYCONNECTIVITY: 'Check relay connectivity',
     REFLEXIVECONNECTIVITY: 'Check reflexive connectivity',
     HOSTCONNECTIVITY: 'Check host connectivity'

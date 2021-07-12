@@ -40,8 +40,12 @@
     .header .title {
       flex: 1;
       font-weight: 300;
+      font-size: 0.75em;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    .header.testrtc-test:hover {
+      background-color: rgba(0,0,0,0.1);
     }
 
     :host[state='success'] iron-icon {
@@ -131,7 +135,7 @@
           // Pass in the "this" object for test reporting and control.
           this.testFunction(this);
         } else {
-          this.reportInfo('Test is disabled.');
+          this.reportError('Test is disabled.');
           this.done();
         }
       },
@@ -148,8 +152,8 @@
           this.state = 'success';
         } else if (this.warningCount > 0 && this.errorCount === 0) {
           this.state = 'warning';
-        } else if (this.isDisabled) {
-          this.state = 'disabled';
+        //} else if (this.isDisabled) {
+        //  this.state = 'disabled';
         } else {
           this.state = 'failure';
         }

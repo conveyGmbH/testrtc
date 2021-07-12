@@ -56,7 +56,6 @@
       padding-left: 1em;
       padding-right: 1em;
       align-items: center;
-      cursor: pointer;
       font-size: 1.3em;
     }
 
@@ -65,15 +64,33 @@
       font-weight: 300;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding: 4px;
+      cursor: pointer;
     }
-
+    span.title.style-scope.testrtc-suite:hover {
+      background-color: rgba(0,0,0,0.1);
+    }
+    .header .settings {
+      flex: 4;
+    }
+    .header .select {
+      font-weight: 300;
+      font-size: 0.75em;
+      border-color: transparent;
+      background-color: transparent;
+      padding: 4px;
+    }
+    .header.testrtc-suite .select.testrtc-suite:hover {
+        background-color: rgba(0,0,0,0.1);
+    }
     #collapse {
-      background-color: #f4f4f4;
+        background-color: #f4f4f4;
     }
   </style>
   <template>
-    <div class="header" on-tap="toggle">
-      <span class="title">{{name}}</span>
+    <div class="header">
+      <span class="title" on-tap="toggle">{{name}}</span>
+      <div class="settings"></div>
       <iron-icon icon="[[_iconForState(state)]]"></iron-icon>
     </div>
     <iron-collapse id="collapse" opened="{{opened}}"></iron-collapse>
@@ -98,6 +115,21 @@
         if (state === 'running') { return 'more-horiz'; }
         return '';
       },
+      attached: function () {
+          var selectElement = null;
+          if (this.name === testSuiteName.CAMERA) {
+              selectElement = document.getElementById("videoSource");
+          } else if (this.name === testSuiteName.MICROPHONE) {
+              selectElement = document.getElementById("audioSource");
+          }
+          if (selectElement) {
+              selectElement.className = "select testrtc-suite";
+              var settingsElement = Polymer.dom(this.root).querySelector(".header .settings");
+              if (settingsElement && !settingsElement.firstElementChild) {
+                  settingsElement.appendChild(selectElement);
+              }
+          }
+      },
       toggle: function() {
         this.$.collapse.toggle();
       },
@@ -111,8 +143,7 @@
       run: function(doneCallback) {
         this.opened = true;
         this.state = 'running';
-        runAllSequentially(this.tests, this.allTestsFinished.bind(this,
-                                                                 doneCallback));
+        runAllSequentially(this.tests, this.allTestsFinished.bind(this, doneCallback));
       },
       allTestsFinished: function(doneCallback) {
         var errors = 0;
@@ -124,10 +155,10 @@
           successes += this.tests[i].successCount;
         }
 
-        if (errors === 0 && warnings === 0 && successes > 0) {
+        if (errors === 0 && successes > 0) {
           this.state = 'success';
           this.opened = false;
-        } else if (errors === 0 && warnings > 0) {
+        } else if (successes > 0) {
           this.state = 'warning';
           this.opened = true;
         } else {
@@ -155,7 +186,25 @@ function runAllSequentially(tasks, doneCallback) {
       doneCallback();
       return;
     }
-    tasks[current].run(runNextAsync);
+    var task = tasks[current];
+    if (task.name === testSuiteName.THROUGHPUT) {
+      for (var i = 0; i < current; i++) {
+          if (tasks[i].name === testSuiteName.NETWORK) {
+              var relayTest = tasks[i].tests.filter(function(test) {
+                  return test.name === testCaseName.TCPENABLED;
+              })[0];
+              if (relayTest && !relayTest.successCount) {
+                  task.tests.forEach(function(test) {
+                      if (test.name === testCaseName.DATATHROUGHPUTRELAY ||
+                          test.name === testCaseName.VIDEOBANDWIDTHRELAY) {
+                          test.isDisabled = true;
+                      }
+                  });
+              }
+          }
+      }
+    }
+    task.run(runNextAsync);
   }
 }
 </script>
