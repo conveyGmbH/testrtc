@@ -27,18 +27,23 @@
       max-width: 40em;
       margin: 1em auto 1em auto;
     }
-
+    .titlebar .title {
+      margin-left: 0;
+    }
+    #reportButton {
+      margin: 0;
+    }
     #reportButton > iron-icon {
-        margin: 4px;
+      margin: 4px;
     }
     #reportButton:hover {
         background-color: rgba(0, 0, 0, 0.1);
     }
-
     #startButton {
         line-height: 3em;
         background-color: #9E9;
         color: #000;
+        margin: 0;
     }
     #startButton:hover {
         background-color: #8c8;
@@ -62,7 +67,7 @@
     <paper-toolbar class="titlebar">
         <span class="title">WebRTC Test</span>
         <paper-button id="reportButton" on-tap="openBugReport">Report<iron-icon icon="cloud-download"></iron-icon></paper-button>
-        <paper-button id="startButton" on-tap="run" raised disabled>Start all</paper-button>
+        <paper-button id="startButton" on-tap="run" raised disabled>Start</paper-button>
     </paper-toolbar>
 
     <div style="display:none">
