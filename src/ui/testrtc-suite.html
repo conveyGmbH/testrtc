@@ -66,12 +66,17 @@
       text-overflow: ellipsis;
       padding: 4px;
       cursor: pointer;
+      min-width: 120px;
     }
     span.title.style-scope.testrtc-suite:hover {
       background-color: rgba(0,0,0,0.1);
     }
     .header .settings {
       flex: 4;
+      max-width: calc(100% - 150px);
+    }
+    .header .status {
+      flex: 30px;
     }
     .header .select {
       font-weight: 300;
@@ -79,6 +84,7 @@
       border-color: transparent;
       background-color: transparent;
       padding: 4px;
+      max-width: 100%;
     }
     .header.testrtc-suite .select.testrtc-suite:hover {
         background-color: rgba(0,0,0,0.1);
@@ -91,7 +97,7 @@
     <div class="header">
       <span class="title" on-tap="toggle">{{name}}</span>
       <div class="settings"></div>
-      <iron-icon icon="[[_iconForState(state)]]"></iron-icon>
+      <div class="status"><iron-icon icon="[[_iconForState(state)]]"></iron-icon></div>
     </div>
     <iron-collapse id="collapse" opened="{{opened}}"></iron-collapse>
   </template>
